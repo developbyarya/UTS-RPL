@@ -44,8 +44,7 @@ class SuccessPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: ElevatedButton(
-                onPressed: () {}, // Tambahkan fungsi kembali
-                child: Text('Kembali ke Halaman Utama'),
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity, 48),
                   backgroundColor: Colors.green,
@@ -53,7 +52,8 @@ class SuccessPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   foregroundColor: Colors.white,
-                ),
+                ), // Tambahkan fungsi kembali
+                child: Text('Kembali ke Halaman Utama'),
               ),
             )
           ],

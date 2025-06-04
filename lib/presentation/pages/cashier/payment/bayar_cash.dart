@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class CashConfirmationPage extends StatelessWidget {
   final int totalHarga = 5000;
 
+  const CashConfirmationPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

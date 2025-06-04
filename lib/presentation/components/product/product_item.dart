@@ -7,12 +7,12 @@ class ProductItem extends StatelessWidget {
   final String imagePath;
 
   const ProductItem({
-    Key? key,
+    super.key,
     required this.name,
     required this.price,
     required this.stock,
     required this.imagePath,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

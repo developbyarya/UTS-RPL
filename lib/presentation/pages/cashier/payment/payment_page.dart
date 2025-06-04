@@ -3,17 +3,21 @@ import 'package:flutter/material.dart';
 class MetodePembayaranPage extends StatelessWidget {
   final int totalHarga = 5000;
 
+  const MetodePembayaranPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     TextEditingController uangDiterimaController =
-        TextEditingController(text: 'Rp. ${totalHarga}');
+        TextEditingController(text: 'Rp. $totalHarga');
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Metode Pembayaran'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {}, // No back functionality needed
+          onPressed: () {
+            Navigator.pop(context);
+          }, // No back functionality needed
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -73,6 +77,7 @@ class MetodePembayaranPage extends StatelessWidget {
           ],
         ),
       ),
+      
     );
   }
 }
@@ -82,7 +87,7 @@ class PaymentButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-  const PaymentButton({
+  const PaymentButton({super.key, 
     required this.label,
     required this.icon,
     required this.onTap,

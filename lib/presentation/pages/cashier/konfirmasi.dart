@@ -1,20 +1,11 @@
 import 'package:flutter/material.dart';
-
+import 'package:posapp/model/ItemModel.dart';
+import 'package:posapp/model/itemCartModel.dart';
+import 'package:posapp/presentation/pages/cashier/payment/payment_page.dart';
 class KonfirmasiPage extends StatelessWidget {
-  final List<Map<String, dynamic>> cartItems = [
-    {
-      'name': 'Oreo',
-      'image': 'assets/images/oreo.jpg',
-      'price': 3000,
-      'quantity': 1,
-    },
-    {
-      'name': 'Snickers',
-      'image': 'assets/images/snickers.jpg',
-      'price': 2000,
-      'quantity': 1,
-    },
-  ];
+  final List<ItemCartModel> cartItems;
+
+  const KonfirmasiPage({super.key, required this.cartItems});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +14,9 @@ class KonfirmasiPage extends StatelessWidget {
         title: Text('Konfirmasi'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {}, // no navigation logic needed
+          onPressed: () {
+            Navigator.pop(context);
+          }, // no navigation logic needed
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -46,7 +39,7 @@ class KonfirmasiPage extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.asset(
-                          item['image'],
+                          item.imagePath,
                           width: 60,
                           height: 60,
                           fit: BoxFit.cover,
@@ -58,14 +51,14 @@ class KonfirmasiPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              item['name'],
+                              item.name,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
                             SizedBox(height: 4),
-                            Text('Jumlah: ${item['quantity']}'),
+                            Text('Jumlah: ${item.quantity}'),
                           ],
                         ),
                       ),
@@ -73,12 +66,12 @@ class KonfirmasiPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Rp. ${item['price'].toString()}',
+                            'Rp. ${item.price.toString()}',
                             style: TextStyle(fontSize: 14),
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'Total: Rp. ${(item['price'] * item['quantity'])}',
+                            'Total: Rp. ${(item.price * item.quantity)}',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
@@ -95,7 +88,9 @@ class KonfirmasiPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => MetodePembayaranPage()));
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
                 padding: EdgeInsets.symmetric(vertical: 16),
@@ -106,7 +101,7 @@ class KonfirmasiPage extends StatelessWidget {
               ),
               child: Text(
                 'Konfirmasi Pembelian',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: 16, color: Colors.white),
               ),
             ),
           ),

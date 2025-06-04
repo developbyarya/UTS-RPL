@@ -21,8 +21,8 @@ class EditProdukPage extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    'https://i.imgur.com/YW0cTDA.png', // contoh gambar oreo
+                  child: Image.asset(
+                    'assets/oreo.png', // contoh gambar oreo
                     height: 100,
                     width: 100,
                     fit: BoxFit.cover,
