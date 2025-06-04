@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:posapp/presentation/pages/cashier/home/daftar_produk.dart';
 
 class SuccessPage extends StatelessWidget {
   const SuccessPage({super.key});
@@ -44,7 +45,9 @@ class SuccessPage extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => ProductListPage()), (route) => false);
+                },
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity, 48),
                   backgroundColor: Colors.green,

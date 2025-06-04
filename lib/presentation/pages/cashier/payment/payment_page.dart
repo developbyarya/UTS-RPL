@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:posapp/presentation/pages/cashier/payment/bayar_cash.dart';
+import 'package:posapp/presentation/pages/cashier/home/daftar_produk.dart';
+class MetodePembayaranPage extends StatefulWidget {
+  final int totalHarga;
 
-class MetodePembayaranPage extends StatelessWidget {
-  final int totalHarga = 5000;
+  const MetodePembayaranPage({super.key, required this.totalHarga});
 
-  const MetodePembayaranPage({super.key});
+  @override
+  State<MetodePembayaranPage> createState() => _MetodePembayaranPageState();
+}
+
+class _MetodePembayaranPageState extends State<MetodePembayaranPage> {
+  TextEditingController uangDiterimaController = TextEditingController();
+  bool isValidAmount = false;
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController uangDiterimaController =
-        TextEditingController(text: 'Rp. $totalHarga');
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Metode Pembayaran'),
@@ -31,7 +37,7 @@ class MetodePembayaranPage extends StatelessWidget {
           children: [
             SizedBox(height: 24),
             Text(
-              'Rp ${totalHarga.toString()}',
+              'Rp ${widget.totalHarga}',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
@@ -55,29 +61,61 @@ class MetodePembayaranPage extends StatelessWidget {
             SizedBox(height: 8),
             TextField(
               controller: uangDiterimaController,
+              keyboardType: TextInputType.number,
+              onChanged: (value) {
+                if (value.isEmpty) {
+                  setState(() {
+                    isValidAmount = false;
+                  });
+                  return;
+                }
+                try {
+                  int amount = int.parse(value);
+                  setState(() {
+                    isValidAmount = amount >= widget.totalHarga;
+                  });
+                } catch (e) {
+                  setState(() {
+                    isValidAmount = false;
+                  });
+                }
+              },
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
+                errorText: !isValidAmount && uangDiterimaController.text.isNotEmpty
+                    ? 'Jumlah harus lebih besar atau sama dengan total harga'
+                    : null,
               ),
-              readOnly: true,
             ),
             SizedBox(height: 32),
             PaymentButton(
               label: 'CASH',
               icon: Icons.attach_money,
-              onTap: () {},
+              onTap: !isValidAmount
+                  ? null
+                  : () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CashConfirmationPage(
+                                  totalHarga: widget.totalHarga,
+                                  uangDiterima:
+                                      int.parse(uangDiterimaController.text))));
+                    },
             ),
             SizedBox(height: 16),
             PaymentButton(
               label: 'CARD',
               icon: Icons.credit_card,
-              onTap: () {},
+              onTap: () {
+                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => ProductListPage()), (route) => false);
+              },
             ),
           ],
         ),
       ),
-      
     );
   }
 }
@@ -85,9 +123,10 @@ class MetodePembayaranPage extends StatelessWidget {
 class PaymentButton extends StatelessWidget {
   final String label;
   final IconData icon;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
-  const PaymentButton({super.key, 
+  const PaymentButton({
+    super.key,
     required this.label,
     required this.icon,
     required this.onTap,

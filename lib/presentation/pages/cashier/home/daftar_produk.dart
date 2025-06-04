@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:posapp/model/ItemModel.dart';
 import 'package:posapp/model/itemCartModel.dart';
 import 'package:posapp/presentation/components/product/product_item.dart';
+import 'package:posapp/presentation/components/reuseable/sidebar.dart';
 import 'package:posapp/presentation/pages/cashier/konfirmasi.dart';
 
 class ProductListPage extends StatefulWidget {
@@ -58,13 +59,23 @@ class _ProductListPageState extends State<ProductListPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: Icon(Icons.menu, color: Colors.black),
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+              icon: Icon(Icons.menu, color: Colors.black),
+            );
+          }
+        ),
         title:
             const Text('Daftar Produk', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
       ),
+      drawer: Sidebar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -131,12 +142,12 @@ class _ProductListPageState extends State<ProductListPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
           
-        },
-        child: Icon(Icons.shopping_cart),
-      ),
+      //   },
+      //   child: Icon(Icons.shopping_cart),
+      // ),
     );
   }
 }

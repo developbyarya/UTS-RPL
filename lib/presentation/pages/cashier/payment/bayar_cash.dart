@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:posapp/presentation/pages/cashier/payment/payment_done.dart';
 
 class CashConfirmationPage extends StatelessWidget {
-  final int totalHarga = 5000;
+  final int totalHarga;
+  final int uangDiterima;
 
-  const CashConfirmationPage({super.key});
+  const CashConfirmationPage({super.key, required this.totalHarga, required this.uangDiterima});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +14,9 @@ class CashConfirmationPage extends StatelessWidget {
         title: Text('Cash'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {}, // Tidak ada aksi navigasi
+          onPressed: () {
+            Navigator.pop(context);
+          }, // Tidak ada aksi navigasi
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -40,6 +44,21 @@ class CashConfirmationPage extends StatelessWidget {
                   color: Colors.grey[700],
                 ),
               ),
+              Text(
+                'Uang diterima: Rp ${uangDiterima.toString()}',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[700],
+                ),
+              ),
+              Text(
+                'Kembalian: Rp ${uangDiterima - totalHarga}',
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
           Padding(
@@ -48,12 +67,15 @@ class CashConfirmationPage extends StatelessWidget {
               width: double.infinity,
               height: 50,
               child: ElevatedButton.icon(
-                onPressed: () {}, // Tidak ada aksi
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => SuccessPage()));
+                }, // Tidak ada aksi
                 icon: Icon(Icons.check, color: Colors.white),
                 label: Text(
                   'Penjualan Baru',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(

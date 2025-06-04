@@ -5,10 +5,19 @@ import 'package:posapp/presentation/pages/cashier/payment/payment_page.dart';
 class KonfirmasiPage extends StatelessWidget {
   final List<ItemCartModel> cartItems;
 
-  const KonfirmasiPage({super.key, required this.cartItems});
+  KonfirmasiPage({super.key, required this.cartItems});
+
+  int totalHarga = 0;
+  int countTotalHarga() {
+    for (var item in cartItems) {
+      totalHarga += item.price * item.quantity;
+    }
+    return totalHarga;
+  }
 
   @override
   Widget build(BuildContext context) {
+    countTotalHarga();
     return Scaffold(
       appBar: AppBar(
         title: Text('Konfirmasi'),
@@ -89,7 +98,7 @@ class KonfirmasiPage extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => MetodePembayaranPage()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => MetodePembayaranPage(totalHarga: totalHarga)));
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
