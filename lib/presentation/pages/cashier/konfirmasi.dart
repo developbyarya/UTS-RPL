@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:posapp/model/ItemModel.dart';
 import 'package:posapp/model/itemCartModel.dart';
 import 'package:posapp/presentation/pages/cashier/payment/payment_page.dart';
 class KonfirmasiPage extends StatelessWidget {
@@ -47,7 +46,7 @@ class KonfirmasiPage extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(
+                        child: Image.network(
                           item.imagePath,
                           width: 60,
                           height: 60,

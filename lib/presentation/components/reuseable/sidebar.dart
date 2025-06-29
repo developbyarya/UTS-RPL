@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:posapp/presentation/pages/produk/product_management.dart';
 
 class Sidebar extends StatelessWidget {
   const Sidebar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       child: Drawer(
         child: Column(
@@ -49,6 +50,9 @@ class Sidebar extends StatelessWidget {
             ),
             ListTile(
               leading: Icon(Icons.inventory_2_outlined, color: Colors.green),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ProductManagementPage()));
+              },
               title: Text('Produk'),
             ),
             ListTile(

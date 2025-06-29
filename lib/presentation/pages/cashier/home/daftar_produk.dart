@@ -4,6 +4,7 @@ import 'package:posapp/model/itemCartModel.dart';
 import 'package:posapp/presentation/components/product/product_item.dart';
 import 'package:posapp/presentation/components/reuseable/sidebar.dart';
 import 'package:posapp/presentation/pages/cashier/konfirmasi.dart';
+import 'package:posapp/controller/productController.dart';
 
 class ProductListPage extends StatefulWidget {
   const ProductListPage({super.key});
@@ -13,27 +14,46 @@ class ProductListPage extends StatefulWidget {
 }
 
 class _ProductListPageState extends State<ProductListPage> {
-  final List<ItemModel> dummyProducts =[
-    ItemModel(
-      id: "1",
-      name: "Oreo",
-      price: 3000,
-      stock: 20,
-      imagePath: "assets/dummy_product_image/oreo.png",
-    ),
-    ItemModel(
-      id: "2",
-      name: "Snickers",
-      price: 2000,
-      stock: 20,
-      imagePath: "assets/dummy_product_image/snickers.png",
-    ),   
-    // tambahkan item lainnya
-  ];
+  final ProductController _productController = ProductController();
+  List<ItemModel> products = [];
+  bool isLoading = true;
 
   final List<ItemCartModel> cartItems = [];
 
   int totalPrice = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
+
+  Future<void> _loadProducts() async {
+    setState(() {
+      isLoading = true;
+    });
+    
+    try {
+      await _productController.getAllProduct();
+      
+      setState(() {
+        products = _productController.toPresentationModel(_productController.products);
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading products: $e');
+      setState(() {
+        isLoading = false;
+      });
+      // Show error message to user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Gagal memuat produk: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
 
   void addToCart(ItemModel product) {
     if (cartItems.any((item) => item.id == product.id)) {
@@ -45,7 +65,11 @@ class _ProductListPageState extends State<ProductListPage> {
           imagePath: product.imagePath,
           price: product.price,
           stock: product.stock,
-          quantity: 1
+          quantity: 1,
+          discount: product.discount,
+          sourceName: product.sourceName,
+          purchasePrice: product.purchasePrice,
+          barcode: product.barcode,
         ));
       }
     setState(() {
@@ -74,6 +98,12 @@ class _ProductListPageState extends State<ProductListPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: _loadProducts,
+            icon: Icon(Icons.refresh, color: Colors.black),
+          ),
+        ],
       ),
       drawer: Sidebar(),
       body: Padding(
@@ -98,29 +128,52 @@ class _ProductListPageState extends State<ProductListPage> {
             const SizedBox(height: 16),
             // Grid produk
             Expanded(
-              child: GridView.builder(
-                itemCount: dummyProducts.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.75,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                ),
-                itemBuilder: (context, index) {
-                  final product = dummyProducts[index];
-                  return InkWell(
-                    onTap: () {
-                      addToCart(product);
-                    },
-                    child: ProductItem(
-                      name: product.name,
-                      price: product.price,
-                      stock: product.stock,
-                      imagePath: product.imagePath,
-                    ),
-                  );
-                },
-              ),
+              child: isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : products.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey),
+                              SizedBox(height: 16),
+                              Text(
+                                'Tidak ada produk tersedia',
+                                style: TextStyle(fontSize: 16, color: Colors.grey),
+                              ),
+                              SizedBox(height: 8),
+                              ElevatedButton(
+                                onPressed: _loadProducts,
+                                child: Text('Muat Ulang'),
+                              ),
+                            ],
+                          ),
+                        )
+                      : GridView.builder(
+                          itemCount: products.length,
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.75,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                          ),
+                          itemBuilder: (context, index) {
+                            final product = products[index];
+                            return InkWell(
+                              onTap: () {
+                                addToCart(product);
+                              },
+                              child: ProductItem(
+                                name: product.name,
+                                price: product.price,
+                                stock: product.stock,
+                                imagePath: product.imagePath,
+                              ),
+                            );
+                          },
+                        ),
             ),
           ],
         ),
@@ -128,7 +181,7 @@ class _ProductListPageState extends State<ProductListPage> {
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         child: ElevatedButton.icon(
-          onPressed: () {
+          onPressed: cartItems.isEmpty ? null : () {
             Navigator.push(context, MaterialPageRoute(builder: (context) => KonfirmasiPage(cartItems: cartItems)));
           },
           icon: const Icon(Icons.shopping_cart, color: Colors.white),
@@ -142,12 +195,6 @@ class _ProductListPageState extends State<ProductListPage> {
           ),
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-          
-      //   },
-      //   child: Icon(Icons.shopping_cart),
-      // ),
     );
   }
 }

@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:posapp/domain/model/item_model.dart';
+import 'package:posapp/presentation/components/reuseable/image_picker.dart';
+import 'dart:io';
+class EditProdukPage extends StatefulWidget {
+  EditProdukPage({super.key, required this.item});
+  final ItemModel item;
+  bool imageChanged = false;
 
-class EditProdukPage extends StatelessWidget {
-  const EditProdukPage({super.key});
+  @override
+  State<EditProdukPage> createState() => _EditProdukPageState();
+}
 
+class _EditProdukPageState extends State<EditProdukPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,10 +30,15 @@ class EditProdukPage extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    'assets/oreo.png', // contoh gambar oreo
-                    height: 100,
-                    width: 100,
+                  child: widget.imageChanged ? Image.file(
+                    File(widget.item.imageUrl!),
+                    height: 200,
+                    width: 200,
+                    fit: BoxFit.cover,
+                  ) : Image.asset(
+                    widget.item.imageUrl ?? 'assets/dummy_product_image/oreo.png', // contoh gambar oreo
+                    height: 200,
+                    width: 200,
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -32,23 +46,20 @@ class EditProdukPage extends StatelessWidget {
                 Expanded(
                   child: Column(
                     children: [
-                      ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(Icons.photo_camera),
-                        label: const Text('Ganti Foto'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black,
-                          side: const BorderSide(color: Colors.black12),
-                        ),
-                      ),
+                      CustomizeImagePicker.imagePickerButton(context, "Ganti Foto", onImagePicked: (imagePath) {
+                        setState(() {
+                          widget.item.imageUrl = imagePath;
+                          widget.imageChanged = true;
+                        });
+                      }),
                       const SizedBox(height: 12),
                       TextField(
                         decoration: InputDecoration(
-                          labelText: 'Kode (Barcode)',
+                          labelText: 'Kode (Barcode)', 
                           border: OutlineInputBorder(),
                           suffixIcon: Icon(Icons.qr_code),
                         ),
+                        controller: TextEditingController(text: widget.item.barcode),
                       ),
                     ],
                   ),
@@ -63,6 +74,7 @@ class EditProdukPage extends StatelessWidget {
                 labelText: 'Nama Produk',
                 border: OutlineInputBorder(),
               ),
+              controller: TextEditingController(text: widget.item.name),
             ),
             const SizedBox(height: 12),
 
@@ -76,6 +88,7 @@ class EditProdukPage extends StatelessWidget {
                       labelText: 'Harga Produk',
                       border: OutlineInputBorder(),
                     ),
+                    controller: TextEditingController(text: widget.item.price.toString()),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -85,6 +98,7 @@ class EditProdukPage extends StatelessWidget {
                       labelText: 'Diskon',
                       border: OutlineInputBorder(),
                     ),
+                    controller: TextEditingController(text: widget.item.discount.toString()),
                   ),
                 ),
               ],
@@ -102,16 +116,16 @@ class EditProdukPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Sumber Grosir: Mirota',
+                          'Sumber Grosir: ${widget.item.sourceName}',
                           style: TextStyle(fontWeight: FontWeight.w600),
                         ),
                         SizedBox(height: 4),
-                        Text('Stok: 20    Harga Beli: Rp. 2500'),
+                        Text('Stok: ${widget.item.stock}    Harga Beli: Rp. ${widget.item.purchasePrice}'),
                       ],
                     ),
                   ),
@@ -132,7 +146,7 @@ class EditProdukPage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
                 ),
-                child: const Text('Simpan'),
+                child: const Text('Simpan', style: TextStyle(color: Colors.white),),
               ),
             ),
           ],
