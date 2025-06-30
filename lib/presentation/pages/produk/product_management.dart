@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:posapp/presentation/pages/diskon%20&%20pengubah/DaftarPengubah.dart';
+import 'package:posapp/presentation/pages/diskon%20&%20pengubah/daftar_diskon.dart';
 import 'package:posapp/presentation/pages/produk/daftar_produk.dart';
 import 'package:posapp/presentation/pages/produk/kategori_produk.dart';
 class ProductManagementPage extends StatelessWidget {
@@ -44,7 +46,10 @@ class ProductManagementPage extends StatelessWidget {
               icon: Icons.extension,
               label: 'Pengubah',
               onTap: () {
-                // TODO: Navigate to modifiers page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DaftarPengubah()),
+                );
               },
               color: Colors.green,
             ),
@@ -52,7 +57,10 @@ class ProductManagementPage extends StatelessWidget {
               icon: Icons.local_offer,
               label: 'Diskon',
               onTap: () {
-                // TODO: Navigate to discounts page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const DaftarDiskonPage()),
+                );
               },
               color: Colors.green,
             ),

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:posapp/presentation/components/reuseable/barcode_scanner.dart';
 import 'package:posapp/presentation/components/reuseable/image_picker.dart';
 import 'package:posapp/controller/productController.dart';
 
@@ -212,7 +213,11 @@ class _TambahProdukPageState extends State<TambahProdukPage> {
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => BarcodeScannerWidget(onDetect: (code) {
+                      _barcodeController.text = code;
+                    })));
+                  },
                   icon: const Icon(Icons.qr_code_scanner, color: Colors.white,),
                   label: const Text('Scan', style: TextStyle(color: Colors.white),),
                   style: ElevatedButton.styleFrom(

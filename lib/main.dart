@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:posapp/controller/user_provider.dart';
+import 'package:posapp/presentation/pages/auth/login_page.dart';
 import 'package:posapp/presentation/pages/cashier/home/daftar_produk.dart';
-import 'package:posapp/presentation/pages/struk/daftar-struk.dart';
-
 
 void main() {
   runApp(const MyApp());
@@ -10,12 +11,26 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Kinandaru POS',
-      home: ProductListPage(),
+    return ChangeNotifierProvider(
+      create: (context) => UserProvider(),
+      child: MaterialApp(
+        title: 'Kinandaru POS',
+        theme: ThemeData(
+          primarySwatch: Colors.green,
+          useMaterial3: true,
+        ),
+        home: Consumer<UserProvider>(
+          builder: (context, userProvider, child) {
+            if (userProvider.isLoggedIn) {
+              return const ProductListPage();
+            } else {
+              return const LoginPage();
+            }
+          },
+        ),
+      ),
     );
   }
 }
