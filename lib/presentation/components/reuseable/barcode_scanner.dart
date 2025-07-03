@@ -16,43 +16,27 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
   bool isDetected = false;
   bool hasPermission = false;
   bool isLoading = true;
-  String? errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _initializeScanner();
+    _checkPermission();
   }
 
-  Future<void> _initializeScanner() async {
+  Future<void> _checkPermission() async {
     try {
-      print('Initializing scanner...');
-      
-      // Check camera permission
+      print('Checking camera permission...');
       final status = await Permission.camera.request();
-      print('Camera permission status: $status');
+      print('Camera permission: $status');
       
-      if (status.isGranted) {
-        setState(() {
-          hasPermission = true;
-          isLoading = false;
-        });
-        
-        // Create controller after permission is granted
-        controller = MobileScannerController();
-        print('Scanner initialized successfully');
-      } else {
-        setState(() {
-          hasPermission = false;
-          isLoading = false;
-          errorMessage = 'Camera permission denied';
-        });
-      }
+      setState(() {
+        hasPermission = status.isGranted;
+        isLoading = false;
+      });
     } catch (e) {
-      print('Error initializing scanner: $e');
+      print('Error checking permission: $e');
       setState(() {
         isLoading = false;
-        errorMessage = 'Error initializing scanner: $e';
       });
     }
   }
@@ -65,9 +49,7 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
         isDetected = true;
         widget.onDetect(barcode.rawValue!);
         controller?.stop();
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) Navigator.of(context).pop();
-        });
+        Navigator.of(context).pop();
       }
     }
   }
@@ -82,7 +64,9 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Barcode Scanner'),
+        title: const Text('Scan Barcode'),
+        backgroundColor: Colors.black87,
+        foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -90,25 +74,11 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
         actions: [
           if (hasPermission && controller != null) ...[
             IconButton(
-              icon: ValueListenableBuilder(
-                valueListenable: controller!.torchState,
-                builder: (context, state, _) {
-                  return Icon(
-                    state == TorchState.off ? Icons.flash_off : Icons.flash_on,
-                  );
-                },
-              ),
+              icon: const Icon(Icons.flash_off, color: Colors.white),
               onPressed: () => controller!.toggleTorch(),
             ),
             IconButton(
-              icon: ValueListenableBuilder(
-                valueListenable: controller!.cameraFacingState,
-                builder: (context, state, _) {
-                  return Icon(
-                    state == CameraFacing.front ? Icons.camera_front : Icons.camera_rear,
-                  );
-                },
-              ),
+              icon: const Icon(Icons.camera_rear, color: Colors.white),
               onPressed: () => controller!.switchCamera(),
             ),
           ],
@@ -120,90 +90,100 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
 
   Widget _buildBody() {
     if (isLoading) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Initializing camera...'),
-          ],
+      return Container(
+        color: Colors.black,
+        child: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(color: Colors.white),
+              SizedBox(height: 16),
+              Text(
+                'Checking camera permission...',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
         ),
       );
     }
 
     if (!hasPermission) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.camera_alt_outlined,
-              size: 64,
-              color: Colors.grey,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Camera permission is required',
-              style: TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _initializeScanner,
-              child: const Text('Grant Permission'),
-            ),
-          ],
+      return Container(
+        color: Colors.black,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.camera_alt_outlined,
+                size: 64,
+                color: Colors.white,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Camera permission is required',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _checkPermission,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                ),
+                child: const Text('Grant Permission'),
+              ),
+            ],
+          ),
         ),
       );
     }
 
-    if (errorMessage != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.error_outline,
-              size: 64,
-              color: Colors.red,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Error: $errorMessage',
-              style: const TextStyle(fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  errorMessage = null;
-                });
-                _initializeScanner();
-              },
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      );
-    }
-
+    // Create controller only when we have permission and need to show the scanner
     if (controller == null) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Setting up camera...'),
-          ],
-        ),
+      controller = MobileScannerController(
+        detectionSpeed: DetectionSpeed.noDuplicates,
+        facing: CameraFacing.back,
+        torchEnabled: false,
       );
     }
 
-    return MobileScanner(
-      controller: controller!,
-      onDetect: _onDetect,
+    return Container(
+      color: Colors.black,
+      child: Stack(
+        children: [
+          MobileScanner(
+            controller: controller!,
+            onDetect: _onDetect,
+          ),
+          Center(
+            child: Container(
+              width: 250,
+              height: 250,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.white, width: 2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 100,
+            left: 0,
+            right: 0,
+            child: const Center(
+              child: Text(
+                'Position barcode within the frame',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  backgroundColor: Colors.black54,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

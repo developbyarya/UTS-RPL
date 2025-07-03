@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Include release APK for distribution
+!build/app/outputs/flutter-apk/app-release.apk
